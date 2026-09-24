@@ -27,3 +27,8 @@ config_schema:
   inject: {type: bool, default: true, description: "Si es false, clasifica y registra pero NO inyecta la guía (modo observación)."}
   overrides_path: {type: str, default: "", description: "Ruta a un YAML/JSON que sobreescribe las declaraciones de criterio y las guías. Vacío = usar las internas."}
   read_user_md: {type: bool, default: true, description: "Leer el nombre del usuario del perfil real (USER.md) para la declaración de la ruta 'user'. Si es false, usa el texto genérico."}
+  # TELEMETRIA: se escribe a un archivo LOCAL, nunca al mensaje del modelo, para no
+  # agregar payload al turno. Una linea JSONL por clasificacion (ruta, confianza,
+  # distribucion, latencia, motivo de fallo). Rotacion a .1 al pasar de 4 MB.
+  telemetry: {type: bool, default: true, description: "Registrar cada clasificacion en un archivo local (sin payload). No afecta la guia inyectada."}
+  telemetry_path: {type: str, default: "", description: "Ruta del JSONL de telemetria. Vacio = <home del perfil>/logs/jev-helper.jsonl."}

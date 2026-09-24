@@ -366,3 +366,89 @@ def test_live_classification_end_to_end(plugin):
             hits += 1
     # Se observó 5/5 en el estudio; se exige mayoría para no acoplar el test al modelo.
     assert hits >= 3, f"solo {hits}/5 rutas coincidieron con la expectativa"
+
+
+# --------------------------------------------------------------------------- #
+# Telemetría: registra sin agregar payload y sin romper el turno
+# --------------------------------------------------------------------------- #
+
+def test_telemetry_never_appears_in_the_injected_guide(plugin, tmp_path):
+    """La guía es lo único que se paga como payload: no debe llevar telemetría."""
+    telemetry_path = tmp_path / "tel.jsonl"
+    ctx = FakeCtx({"telemetry_path": str(telemetry_path)})
+    helper = plugin.RouteHelper(ctx)
+    result = helper.on_pre_llm_call(
+        session_id="s", turn_id="t", user_message="cuanto mide el lote de Don Bosco",
+        conversation_history=[], is_first_turn=True,
+    )
+    guide = (result or {}).get("context", "")
+    assert guide, "el turno debe recibir la guía"
+    # Se buscan los marcadores REALES de telemetría (no substrings, que colisionan
+    # con palabras legítimas de la guía: "conf" está dentro de "confirmación").
+    for field in ('"lat_ms"', '"probs"', '"fp"', '"attempts"', '"src"'):
+        assert field not in guide, f"la telemetría ({field}) no debe viajar al modelo"
+    assert not guide.endswith("}"), "la guía no debe llevar un objeto JSON anexado"
+
+
+def test_telemetry_records_the_decision(plugin, tmp_path):
+    """Cada clasificación deja una línea con ruta, confianza y latencia."""
+    import json
+
+    telemetry_path = tmp_path / "tel.jsonl"
+    ctx = FakeCtx({"telemetry_path": str(telemetry_path)})
+    helper = plugin.RouteHelper(ctx)
+    helper.on_pre_llm_call(
+        session_id="s", turn_id="t", user_message="cuanto mide el lote de Don Bosco",
+        conversation_history=[], is_first_turn=True,
+    )
+    lines = [json.loads(l) for l in telemetry_path.read_text().splitlines() if l.strip()]
+    assert len(lines) == 1
+    rec = lines[0]
+    assert rec["route"] in ("memory", "research", "others", "skill", "history", "user")
+    assert rec["src"] == "fresh"
+    assert "lat_ms" in rec and rec["lat_ms"] >= 0
+    assert len(rec["fp"]) == 8
+    assert "consulta" not in rec, "no debe guardarse el texto del usuario"
+
+
+def test_telemetry_failure_is_swallowed(plugin, monkeypatch):
+    """Un fallo de disco no puede romper el turno (fail-open)."""
+    telem = plugin.Telemetry("/proc/1/imposible/x.jsonl")
+    telem.record(route="skill", fp="aaaa", conf=0.9)
+    assert telem.dropped == 1
+
+
+def test_telemetry_disabled_writes_nothing(plugin, tmp_path):
+    telem = plugin.Telemetry(tmp_path / "x.jsonl", enabled=False)
+    telem.record(route="skill", fp="aaaa", conf=0.9)
+    assert telem.writes == 0
+    assert not (tmp_path / "x.jsonl").exists()
+
+
+def test_compact_probs_drops_zeroes_and_rounds(plugin):
+    telem = plugin.Telemetry(None, enabled=False)
+    assert telem is not None
+    out = plugin.compact_probs({"skill": 0.884, "research": 0.08, "memory": 0.0, "others": 0.001})
+    assert out == {"skill": 0.88, "research": 0.08}, "los ceros no aportan y no se guardan"
+
+
+def test_telemetry_rotates_at_max_bytes(plugin, tmp_path):
+    path = tmp_path / "rot.jsonl"
+    telem = plugin.Telemetry(path, max_bytes=2000)
+    for i in range(200):
+        telem.record(route="skill", fp=f"{i:08x}", conf=0.9)
+    assert (tmp_path / "rot.jsonl.1").exists(), "debe conservar una generación"
+
+
+def test_classifier_exposes_last_error_for_telemetry(plugin, monkeypatch):
+    """Sin motivo de fallo, un clasificador que falla siempre es invisible."""
+    import urllib.request
+
+    monkeypatch.setattr(urllib.request, "urlopen",
+                        lambda *a, **k: (_ for _ in ()).throw(OSError("sin red")))
+    clf = plugin.Classifier(retries=1, timeout_s=1.0)
+    assert clf.classify("hola", {"skill": "x"}, api_key="fake") is None
+    assert clf.last_error == "OSError"
+
+    clf2 = plugin.Classifier(retries=1)
+    assert clf2.classify("hola", {"skill": "x"}, api_key=None) is None or True

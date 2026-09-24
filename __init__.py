@@ -49,8 +49,17 @@ from typing import Any, Dict, Optional
 
 from .classifier import Classifier, Decision, resolve_api_key
 from .routing import ESCAPE_ROUTE, ROUTES, declarations, guides, load_overrides
+from .telemetry import Telemetry, compact_probs, text_fingerprint
 
 logger = logging.getLogger(__name__)
+
+# Símbolos que la suite de tests monta desde el paquete (mismo patrón que el
+# plugin de referencia del arnés).
+__all__ = [
+    "RouteHelper", "Classifier", "Decision", "Telemetry",
+    "compact_probs", "text_fingerprint", "resolve_api_key", "register",
+    "ROUTES", "ESCAPE_ROUTE", "MAX_TEXT_CHARS",
+]
 
 # Máximo de caracteres del mensaje del usuario que se envían al clasificador.
 # Un turno puede traer texto enorme (una pega larga); clasificar la intención no
@@ -69,6 +78,7 @@ class RouteHelper:
         self._ctx = ctx
         self._turns: Dict[str, str] = {}      # turn_id -> ruta inyectada
         self._last_route: Optional[str] = None
+        self._telemetry: Optional[Telemetry] = None
 
     # ------------------------------------------------------------------ config
     def _get(self, key: str, default: Any = None) -> Any:
@@ -104,6 +114,42 @@ class RouteHelper:
             min_confidence=float(self._get("min_confidence", 0.0) or 0.0),
             api_key_env=self._api_key_env(),
         )
+
+    def _telem(self) -> Telemetry:
+        """Telemetría local, construida una sola vez por carga del plugin.
+
+        Escribe a un ARCHIVO, nunca al mensaje del modelo: lo que se anexa al turno
+        se paga como tokens de entrada en cada llamada, y la telemetría no debe
+        costar payload.
+        """
+        telem = self._telemetry
+        if telem is None:
+            telem = self._telemetry = Telemetry(
+                str(self._get("telemetry_path", "") or "") or None,
+                enabled=bool(self._get("telemetry", True)),
+            )
+        return telem
+
+    def _record_telemetry(self, clf: Classifier, text: str, route: str,
+                          decision: Optional[Decision], **extra: Any) -> None:
+        """Escribe una línea de telemetría. Fail-open: nunca rompe el turno."""
+        try:
+            fields: Dict[str, Any] = {
+                "route": route,
+                "fp": text_fingerprint(text),
+            }
+            if decision is not None:
+                fields["conf"] = round(decision.confidence, 2)
+                fields["probs"] = compact_probs(decision.probabilities)
+                fields["raw"] = decision.route
+            fields["lat_ms"] = round(clf.last_latency_ms, 1)
+            fields["attempts"] = clf.last_attempts
+            if clf.last_error:
+                fields["err"] = clf.last_error
+            fields.update(extra)
+            self._telem().record(**fields)
+        except Exception:
+            pass
 
     def _criteria_and_guides(self) -> tuple[Dict[str, str], Dict[str, str], str]:
         """Devuelve (declaraciones, guías, nombre de usuario).
@@ -187,6 +233,9 @@ class RouteHelper:
             route = self._turns[turn_id]
             _, gds, _ = self._criteria_and_guides()
             guide = gds.get(route)
+            # Se registra con src="reentry" para poder separar los reintentos del
+            # arnés de las clasificaciones reales al analizar.
+            self._record_telemetry(self._classifier(), text, route, None, src="reentry")
             return {"context": guide} if (guide and self.inject) else None
 
         decl, gds, _ = self._criteria_and_guides()
@@ -201,8 +250,14 @@ class RouteHelper:
             )
         except Exception as exc:
             logger.debug("jev-helper: clasificación fallida (fail-open): %s", exc)
+            self._record_telemetry(clf, text, ESCAPE_ROUTE, None,
+                                   src="fresh", exc=type(exc).__name__)
             return None
         if decision is None:
+            # Se registra el motivo real del fallo (no_key, budget, http_429, ...):
+            # sin esto, un clasificador que falla siempre es indistinguible de uno
+            # que nunca se llama.
+            self._record_telemetry(clf, text, ESCAPE_ROUTE, None, src="fresh")
             return None
 
         route = decision.route if decision.route in ROUTES else ESCAPE_ROUTE
@@ -212,6 +267,14 @@ class RouteHelper:
                 decision.confidence, ESCAPE_ROUTE,
             )
             route = ESCAPE_ROUTE
+
+        # El registro va aquí, antes de decidir si se inyecta: así el modo
+        # observación (inject=false) también queda medido.
+        self._record_telemetry(
+            clf, text, route, decision, src="fresh",
+            off=("threshold" if clf.below_threshold(decision) else None),
+            inj=bool(self.inject),
+        )
 
         if turn_id:
             if len(self._turns) >= _MAX_TRACKED_TURNS:
@@ -232,6 +295,10 @@ class RouteHelper:
         """Limpia el estado por turno al abrir sesión."""
         self._turns.clear()
         self._last_route = None
+        # Cada línea ya se escribió con flush; aquí solo se libera el descriptor.
+        if self._telemetry is not None:
+            self._telemetry.close()
+            self._telemetry = None
 
 
 def register(ctx: Any) -> None:

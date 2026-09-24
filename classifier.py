@@ -115,6 +115,12 @@ class Classifier:
         self.retries = max(1, int(retries)) if retries else 1
         self.min_confidence = float(min_confidence or 0.0)
         self.budget_s = DEFAULT_BUDGET_S
+        # Último resultado observado. Se llenan en el camino que YA se recorre (el
+        # reloj ya estaba tomado para el presupuesto), así que exponerlos para la
+        # telemetría no agrega trabajo: es asignar un atributo.
+        self.last_error: Optional[str] = None
+        self.last_attempts: int = 0
+        self.last_latency_ms: float = 0.0
 
     def classify(
         self,
@@ -128,6 +134,7 @@ class Classifier:
             return None
         key = api_key or resolve_api_key(self.api_key_env)
         if not key:
+            self.last_error = "no_key"
             logger.debug("jev-helper: sin credencial disponible; se omite la clasificación")
             return None
 
@@ -148,28 +155,38 @@ class Classifier:
             "Content-Type": "application/json",
         }
 
+        self.last_error = None
         started = time.monotonic()
         last_error: Optional[Exception] = None
         for attempt in range(self.retries):
             budget_left = self.budget_s - (time.monotonic() - started)
             if budget_left <= 0:
+                self.last_error = "budget"
                 logger.debug("jev-helper: presupuesto agotado antes del intento %d", attempt + 1)
                 break
             # Nunca esperar más que el presupuesto restante: así el peor caso queda
             # bajo el límite de hook del arnés.
             attempt_timeout = max(1.0, min(self.timeout_s, budget_left))
+            self.last_attempts = attempt + 1
             try:
                 req = urllib.request.Request(self.endpoint, data=payload, headers=headers)
                 with urllib.request.urlopen(req, timeout=attempt_timeout) as resp:
                     data = json.load(resp)
-                return self._parse(data)
+                decision = self._parse(data)
+                self.last_latency_ms = (time.monotonic() - started) * 1000.0
+                if decision is None:
+                    self.last_error = "parse"
+                return decision
             except urllib.error.HTTPError as exc:
                 last_error = exc
+                self.last_error = f"http_{exc.code}"
                 logger.debug("jev-helper: HTTP %s en intento %d", exc.code, attempt + 1)
             except Exception as exc:  # red, timeout, JSON inválido
                 last_error = exc
+                self.last_error = type(exc).__name__
                 logger.debug("jev-helper: error %s en intento %d", type(exc).__name__, attempt + 1)
 
+        self.last_latency_ms = (time.monotonic() - started) * 1000.0
         if last_error is not None:
             logger.debug("jev-helper: clasificación abandonada: %s", last_error)
         return None
