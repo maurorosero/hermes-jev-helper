@@ -1,0 +1,538 @@
+{
+  "modelo_llm": "openai/gpt-5-mini",
+  "precios": {
+    "in": 2.5e-07,
+    "out": 2e-06
+  },
+  "casos": {
+    "jev": [
+      {
+        "texto": "haceme un resumen del estado del VPS de Alan",
+        "choice": "skill",
+        "probs": {
+          "user": 0.02,
+          "memory": 0.23,
+          "others": 0.04,
+          "skill": 0.67,
+          "history": 0.01,
+          "research": 0.03
+        },
+        "conf": 0.61,
+        "ms": 611.797557095997,
+        "cost": 2.6082e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "como se llamaba el proveedor de Odoo que evaluamos",
+        "choice": "history",
+        "probs": {
+          "memory": 0.3,
+          "others": 0.01,
+          "user": 0,
+          "history": 0.68,
+          "research": 0.01,
+          "skill": 0
+        },
+        "conf": 0.61,
+        "ms": 562.6813219860196,
+        "cost": 2.625e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "manda el informe de caja al contador",
+        "choice": "skill",
+        "probs": {
+          "user": 0,
+          "others": 0.03,
+          "history": 0,
+          "research": 0,
+          "memory": 0,
+          "skill": 0.97
+        },
+        "conf": 0.96,
+        "ms": 683.4084659349173,
+        "cost": 2.5956e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "cuales son las tasas por hora para un proyecto nuevo",
+        "choice": "memory",
+        "probs": {
+          "skill": 0.01,
+          "user": 0,
+          "others": 0.19,
+          "research": 0.06,
+          "history": 0,
+          "memory": 0.74
+        },
+        "conf": 0.68,
+        "ms": 554.7869610600173,
+        "cost": 2.6124e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "Mauro trabaja mejor de noche",
+        "choice": "user",
+        "probs": {
+          "research": 0,
+          "user": 0.97,
+          "skill": 0,
+          "history": 0,
+          "memory": 0,
+          "others": 0.03
+        },
+        "conf": 0.96,
+        "ms": 478.72595593798906,
+        "cost": 2.5914e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "revisa si el contenedor de Frigate esta vivo",
+        "choice": "skill",
+        "probs": {
+          "history": 0,
+          "others": 0,
+          "memory": 0,
+          "skill": 1,
+          "research": 0,
+          "user": 0
+        },
+        "conf": 0.99,
+        "ms": 547.1492409706116,
+        "cost": 2.6208e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "no me des vueltas y decime el numero",
+        "choice": "others",
+        "probs": {
+          "skill": 0.28,
+          "user": 0.05,
+          "memory": 0.13,
+          "others": 0.53,
+          "research": 0,
+          "history": 0.01
+        },
+        "conf": 0.45,
+        "ms": 582.785228965804,
+        "cost": 2.6124e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "que precio tiene el Galaxy Watch 7 en Panama",
+        "choice": "memory",
+        "probs": {
+          "others": 0.02,
+          "memory": 0.51,
+          "history": 0,
+          "user": 0,
+          "research": 0.45,
+          "skill": 0.02
+        },
+        "conf": 0.41,
+        "ms": 506.4074279507622,
+        "cost": 2.6082e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "cuanto mide el lote de la casa de Don Bosco",
+        "choice": "memory",
+        "probs": {
+          "skill": 0,
+          "user": 0,
+          "others": 0.01,
+          "research": 0.06,
+          "history": 0,
+          "memory": 0.93
+        },
+        "conf": 0.91,
+        "ms": 942.8140820236877,
+        "cost": 2.6124e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "yo uso VS Code con Odoo",
+        "choice": "user",
+        "probs": {
+          "history": 0,
+          "user": 0.98,
+          "research": 0,
+          "others": 0.01,
+          "memory": 0,
+          "skill": 0.01
+        },
+        "conf": 0.98,
+        "ms": 492.6460300339386,
+        "cost": 2.5956e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "de que hablamos cuando armamos el plan de Ancon",
+        "choice": "history",
+        "probs": {
+          "others": 0.27,
+          "memory": 0.11,
+          "history": 0.56,
+          "user": 0.01,
+          "research": 0.03,
+          "skill": 0.01
+        },
+        "conf": 0.47,
+        "ms": 483.55201398953795,
+        "cost": 2.6124e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "investiga como facturan las ONG en Panama",
+        "choice": "research",
+        "probs": {
+          "skill": 0.01,
+          "others": 0,
+          "user": 0,
+          "history": 0,
+          "research": 0.99,
+          "memory": 0
+        },
+        "conf": 0.99,
+        "ms": 567.590165999718,
+        "cost": 2.6082e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "subi el archivo al Nextcloud del holding",
+        "choice": "skill",
+        "probs": {
+          "others": 0.25,
+          "user": 0.05,
+          "history": 0.02,
+          "research": 0,
+          "memory": 0.03,
+          "skill": 0.65
+        },
+        "conf": 0.58,
+        "ms": 512.9364309832454,
+        "cost": 2.6124e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "Mauro prefiere que le hable directo sin preambulos",
+        "choice": "user",
+        "probs": {
+          "skill": 0,
+          "user": 1,
+          "memory": 0,
+          "research": 0,
+          "others": 0,
+          "history": 0
+        },
+        "conf": 0.99,
+        "ms": 621.2859069928527,
+        "cost": 2.625e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      },
+      {
+        "texto": "cual es la licencia de Odoo Enterprise para LATAM",
+        "choice": "memory",
+        "probs": {
+          "skill": 0.01,
+          "others": 0.02,
+          "memory": 0.84,
+          "user": 0,
+          "research": 0.13,
+          "history": 0
+        },
+        "conf": 0.82,
+        "ms": 503.4964040387422,
+        "cost": 2.6166e-05,
+        "model": "typesafe/jev-1.13-20260917"
+      }
+    ],
+    "llm": [
+      {
+        "texto": "haceme un resumen del estado del VPS de Alan",
+        "choice": "skill",
+        "probs": {
+          "skill": 0.92,
+          "research": 0.02,
+          "memory": 0.02,
+          "history": 0.02,
+          "user": 0.01,
+          "others": 0.01
+        },
+        "ms": 5925.075859064236,
+        "cost": 0.000845,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 388,
+          "out": 374
+        }
+      },
+      {
+        "texto": "como se llamaba el proveedor de Odoo que evaluamos",
+        "choice": "history",
+        "probs": {
+          "skill": 0.02,
+          "research": 0.02,
+          "memory": 0.12,
+          "history": 0.8,
+          "user": 0.01,
+          "others": 0.03
+        },
+        "ms": 7342.544752988033,
+        "cost": 0.0009695,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 390,
+          "out": 436
+        }
+      },
+      {
+        "texto": "manda el informe de caja al contador",
+        "choice": "skill",
+        "probs": {
+          "skill": 0.92,
+          "research": 0.02,
+          "memory": 0.01,
+          "history": 0.01,
+          "user": 0.02,
+          "others": 0.02
+        },
+        "ms": 6851.151123992167,
+        "cost": 0.00101425,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 385,
+          "out": 459
+        }
+      },
+      {
+        "texto": "cuales son las tasas por hora para un proyecto nuevo",
+        "choice": "research",
+        "probs": {
+          "skill": 0.03,
+          "research": 0.75,
+          "memory": 0.04,
+          "history": 0.02,
+          "user": 0.06,
+          "others": 0.1
+        },
+        "ms": 7852.891532937065,
+        "cost": 0.00118725,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 389,
+          "out": 545
+        }
+      },
+      {
+        "texto": "Mauro trabaja mejor de noche",
+        "choice": "user",
+        "probs": {
+          "skill": 0.01,
+          "research": 0.01,
+          "memory": 0.02,
+          "history": 0.01,
+          "user": 0.92,
+          "others": 0.03
+        },
+        "ms": 7537.505946005695,
+        "cost": 0.000924,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 384,
+          "out": 414
+        }
+      },
+      {
+        "texto": "revisa si el contenedor de Frigate esta vivo",
+        "choice": "skill",
+        "probs": {
+          "skill": 0.92,
+          "research": 0.02,
+          "memory": 0.01,
+          "history": 0.01,
+          "user": 0.01,
+          "others": 0.03
+        },
+        "ms": 5765.0614499580115,
+        "cost": 0.00070925,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 389,
+          "out": 306
+        }
+      },
+      {
+        "texto": "no me des vueltas y decime el numero",
+        "choice": "memory",
+        "probs": {
+          "skill": 0.03,
+          "research": 0.02,
+          "memory": 0.85,
+          "history": 0.02,
+          "user": 0.03,
+          "others": 0.05
+        },
+        "ms": 10253.10840900056,
+        "cost": 0.00096275,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 387,
+          "out": 433
+        }
+      },
+      {
+        "texto": "que precio tiene el Galaxy Watch 7 en Panama",
+        "choice": "research",
+        "probs": {
+          "skill": 0.02,
+          "research": 0.9,
+          "memory": 0.02,
+          "history": 0.01,
+          "user": 0.02,
+          "others": 0.03
+        },
+        "ms": 7032.608638051897,
+        "cost": 0.000895,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 388,
+          "out": 399
+        }
+      },
+      {
+        "texto": "cuanto mide el lote de la casa de Don Bosco",
+        "choice": "memory",
+        "probs": {
+          "skill": 0.03,
+          "research": 0.03,
+          "memory": 0.88,
+          "history": 0.03,
+          "user": 0.03,
+          "others": 0.0
+        },
+        "ms": 7182.469752035104,
+        "cost": 0.00074125,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 389,
+          "out": 322
+        }
+      },
+      {
+        "texto": "yo uso VS Code con Odoo",
+        "choice": "user",
+        "probs": {
+          "skill": 0.02,
+          "research": 0.01,
+          "memory": 0.01,
+          "history": 0.005,
+          "user": 0.95,
+          "others": 0.015
+        },
+        "ms": 4709.887774894014,
+        "cost": 0.00068625,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 385,
+          "out": 295
+        }
+      },
+      {
+        "texto": "de que hablamos cuando armamos el plan de Ancon",
+        "choice": "history",
+        "probs": {
+          "skill": 0.005,
+          "research": 0.02,
+          "memory": 0.06,
+          "history": 0.88,
+          "user": 0.005,
+          "others": 0.03
+        },
+        "ms": 7625.658154953271,
+        "cost": 0.00097925,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 389,
+          "out": 441
+        }
+      },
+      {
+        "texto": "investiga como facturan las ONG en Panama",
+        "choice": "research",
+        "probs": {
+          "skill": 0.02,
+          "research": 0.9,
+          "memory": 0.01,
+          "history": 0.01,
+          "user": 0.01,
+          "others": 0.05
+        },
+        "ms": 4990.398351917975,
+        "cost": 0.00067075,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 387,
+          "out": 287
+        }
+      },
+      {
+        "texto": "subi el archivo al Nextcloud del holding",
+        "choice": "user",
+        "probs": {
+          "skill": 0.02,
+          "research": 0.01,
+          "memory": 0.02,
+          "history": 0.02,
+          "user": 0.9,
+          "others": 0.03
+        },
+        "ms": 5621.439228067175,
+        "cost": 0.00091875,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 387,
+          "out": 411
+        }
+      },
+      {
+        "texto": "Mauro prefiere que le hable directo sin preambulos",
+        "choice": "user",
+        "probs": {
+          "skill": 0.01,
+          "research": 0.01,
+          "memory": 0.02,
+          "history": 0.01,
+          "user": 0.93,
+          "others": 0.02
+        },
+        "ms": 5104.980995994993,
+        "cost": 0.000792,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 392,
+          "out": 347
+        }
+      },
+      {
+        "texto": "cual es la licencia de Odoo Enterprise para LATAM",
+        "choice": "memory",
+        "probs": {
+          "skill": 0.02,
+          "research": 0.05,
+          "memory": 0.85,
+          "history": 0.02,
+          "user": 0.01,
+          "others": 0.05
+        },
+        "ms": 7602.691584033892,
+        "cost": 0.0008335,
+        "model": "openai/gpt-5-mini",
+        "tokens": {
+          "in": 390,
+          "out": 368
+        }
+      }
+    ]
+  }
+}

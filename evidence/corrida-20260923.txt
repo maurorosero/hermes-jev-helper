@@ -1,0 +1,218 @@
+nombre leido de USER.md: Mauro
+
+### pasame el reporte del mes
+  choice: skill   confidence: 0.87
+    skill: 0.89
+    research: 0
+    memory: 0.05
+    history: 0.01
+    user: 0
+    others: 0.05
+
+### configura un proveedor nuevo
+  choice: skill   confidence: 1
+    skill: 1
+    research: 0
+    memory: 0
+    history: 0
+    user: 0
+    others: 0
+
+### ejecuta el validador
+  choice: skill   confidence: 1
+    skill: 1
+    research: 0
+    memory: 0
+    history: 0
+    user: 0
+    others: 0
+
+### programa el respaldo de la base de datos
+  choice: skill   confidence: 1
+    skill: 1
+    research: 0
+    memory: 0
+    history: 0
+    user: 0
+    others: 0
+
+### borra los archivos temporales
+  choice: skill   confidence: 1
+    skill: 1
+    research: 0
+    memory: 0
+    history: 0
+    user: 0
+    others: 0
+
+### investiga actos de habla indirectos
+  choice: research   confidence: 0.98
+    skill: 0.02
+    research: 0.98
+    memory: 0
+    history: 0
+    user: 0
+    others: 0
+
+### haceme un informe de videovigilancia
+  choice: skill   confidence: 0.85
+    skill: 0.88
+    research: 0.08
+    memory: 0
+    history: 0
+    user: 0
+    others: 0.04
+
+### averigua opciones de NVR con GPU
+  choice: research   confidence: 0.86
+    skill: 0.11
+    research: 0.89
+    memory: 0
+    history: 0
+    user: 0
+    others: 0
+
+### cuanto cobramos por hora
+  choice: memory   confidence: 0.74
+    skill: 0.01
+    research: 0.01
+    memory: 0.78
+    history: 0.01
+    user: 0.01
+    others: 0.18
+
+### cual es la capital de Francia
+  choice: memory   confidence: 0.98
+    skill: 0
+    research: 0
+    memory: 0.99
+    history: 0
+    user: 0
+    others: 0.01
+
+### El VPS de Alan corre en Hetzner
+  choice: others   confidence: 0.56
+    skill: 0.01
+    research: 0.01
+    memory: 0.22
+    history: 0
+    user: 0.14
+    others: 0.62
+
+### como funciona la memoria holografica
+  choice: research   confidence: 0.32
+    skill: 0.01
+    research: 0.44
+    memory: 0.37
+    history: 0
+    user: 0
+    others: 0.18
+
+### que te dije ayer sobre el hotel
+  choice: history   confidence: 0.99
+    skill: 0
+    research: 0
+    memory: 0
+    history: 1
+    user: 0
+    others: 0
+
+### que prometimos al cliente del hotel
+  choice: history   confidence: 0.58
+    skill: 0.01
+    research: 0.01
+    memory: 0.29
+    history: 0.65
+    user: 0
+    others: 0.04
+
+### recuerda que hablamos de la videovigilancia
+  choice: history   confidence: 0.99
+    skill: 0
+    research: 0
+    memory: 0.01
+    history: 0.99
+    user: 0
+    others: 0
+
+### Mauro prefiere respuestas concisas sin preambulo
+  choice: user   confidence: 0.98
+    skill: 0
+    research: 0
+    memory: 0.01
+    history: 0
+    user: 0.98
+    others: 0.01
+
+### A Mauro le molesta que le den vueltas antes de responder
+  choice: user   confidence: 0.99
+    skill: 0
+    research: 0
+    memory: 0
+    history: 0
+    user: 1
+    others: 0
+
+### Mauro esta en zona horaria EST
+  choice: user   confidence: 0.82
+    skill: 0
+    research: 0
+    memory: 0.08
+    history: 0
+    user: 0.86
+    others: 0.06
+
+### Mauro tiene nivel tecnico alto
+  choice: user   confidence: 0.99
+    skill: 0
+    research: 0
+    memory: 0
+    history: 0
+    user: 0.99
+    others: 0.01
+
+### quien es Mauro
+  choice: user   confidence: 0.77
+    skill: 0
+    research: 0.03
+    memory: 0.1
+    history: 0
+    user: 0.81
+    others: 0.06
+
+### que prefiere el usuario
+  choice: user   confidence: 0.98
+    skill: 0
+    research: 0
+    memory: 0.01
+    history: 0
+    user: 0.99
+    others: 0
+
+### cuales son mis preferencias
+  choice: user   confidence: 0.98
+    skill: 0
+    research: 0
+    memory: 0.01
+    history: 0
+    user: 0.99
+    others: 0
+
+### mi zona horaria es EST
+  choice: user   confidence: 0.97
+    skill: 0
+    research: 0
+    memory: 0.01
+    history: 0
+    user: 0.98
+    others: 0.01
+
+### como le gusta que le hable al usuario
+  choice: user   confidence: 0.92
+    skill: 0
+    research: 0
+    memory: 0.06
+    history: 0
+    user: 0.9400000000000001
+    others: 0
+

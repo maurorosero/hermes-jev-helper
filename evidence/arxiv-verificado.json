@@ -1,0 +1,215 @@
+[
+ {
+  "id": "2603.25723",
+  "title": "*** NO ENCONTRADO ***",
+  "autores": [],
+  "n_auth": 0,
+  "pub": null,
+  "cat": null,
+  "comment": null,
+  "jref": null
+ },
+ {
+  "id": "2609.01437",
+  "title": "HarnessDev: Can LLMs Create and Evolve Their Own Agent Harness?",
+  "autores": [
+   "Yuhao Wu",
+   "Jingyuan Zhang",
+   "Jiajun Shi"
+  ],
+  "n_auth": 19,
+  "pub": "2026-09-01",
+  "cat": "cs.SE",
+  "comment": "Project page: https://self-developing-agents.github.io/",
+  "jref": null
+ },
+ {
+  "id": "2607.13285",
+  "title": "Harness Handbook: Making Evolving Agent Harnesses Readable,Navigable, and Editable",
+  "autores": [
+   "Ruhan Wang",
+   "Yucheng Shi",
+   "Zongxia Li"
+  ],
+  "n_auth": 10,
+  "pub": "2026-07-14",
+  "cat": "cs.AI",
+  "comment": "29 pages, 6 figures. Project page: https://ruhan-wang.github.io/Harness-Handbook/",
+  "jref": null
+ },
+ {
+  "id": "2502.12378",
+  "title": "Pragmatics in the Era of Large Language Models: A Survey on Datasets, Evaluation, Opportunities and Challenges",
+  "autores": [
+   "Bolei Ma",
+   "Yuting Li",
+   "Wei Zhou"
+  ],
+  "n_auth": 10,
+  "pub": "2025-02-17",
+  "cat": "cs.CL",
+  "comment": "ACL 2025",
+  "jref": null
+ },
+ {
+  "id": "2502.10995",
+  "title": "Evaluating Large language models on Understanding Korean indirect Speech acts",
+  "autores": [
+   "Youngeun Koo",
+   "Jiwoo Lee",
+   "Dojun Park"
+  ],
+  "n_auth": 5,
+  "pub": "2025-02-16",
+  "cat": "cs.CL",
+  "comment": "under review (15 pages)",
+  "jref": null
+ },
+ {
+  "id": "1911.08829",
+  "title": "Casting a Wide Net: Robust Extraction of Potentially Idiomatic Expressions",
+  "autores": [
+   "Hessel Haagsma",
+   "Malvina Nissim",
+   "Johan Bos"
+  ],
+  "n_auth": 3,
+  "pub": "2019-11-20",
+  "cat": "cs.CL",
+  "comment": null,
+  "jref": null
+ },
+ {
+  "id": "2509.07571",
+  "title": "Towards Generalized Routing: Model and Agent Orchestration for Adaptive and Efficient Inference",
+  "autores": [
+   "Xiyu Guo",
+   "Shan Wang",
+   "Chunfang Ji"
+  ],
+  "n_auth": 9,
+  "pub": "2025-09-09",
+  "cat": "cs.MA",
+  "comment": null,
+  "jref": null
+ },
+ {
+  "id": "2503.15850",
+  "title": "Uncertainty Quantification and Confidence Calibration in Large Language Models: A Survey",
+  "autores": [
+   "Xiaoou Liu",
+   "Tiejin Chen",
+   "Longchao Da"
+  ],
+  "n_auth": 6,
+  "pub": "2025-03-20",
+  "cat": "cs.CL",
+  "comment": null,
+  "jref": null
+ },
+ {
+  "id": "2406.03441",
+  "title": "Cycles of Thought: Measuring LLM Confidence through Stable Explanations",
+  "autores": [
+   "Evan Becker",
+   "Stefano Soatto"
+  ],
+  "n_auth": 2,
+  "pub": "2024-06-05",
+  "cat": "cs.CL",
+  "comment": null,
+  "jref": null
+ },
+ {
+  "id": "2310.14774",
+  "title": "Principled Approaches for Learning to Defer with Multiple Experts",
+  "autores": [
+   "Anqi Mao",
+   "Mehryar Mohri",
+   "Yutao Zhong"
+  ],
+  "n_auth": 3,
+  "pub": "2023-10-23",
+  "cat": "cs.LG",
+  "comment": "ISAIM 2024",
+  "jref": null
+ },
+ {
+  "id": "2605.28840",
+  "title": "How Consistent Are LLM Agents? Measuring Behavioral Reproducibility in Multi-Step Tool-Calling Pipelines",
+  "autores": [
+   "Abel Yagubyan"
+  ],
+  "n_auth": 1,
+  "pub": "2026-04-23",
+  "cat": "cs.CL",
+  "comment": "16 pages, 6 figures",
+  "jref": null
+ },
+ {
+  "id": "2606.08998",
+  "title": "The Token Not Taken: Sampling, State, and the Stochasticity of AI Agents",
+  "autores": [
+   "Muhammad Zia Hydari",
+   "Raja Iqbal"
+  ],
+  "n_auth": 2,
+  "pub": "2026-06-08",
+  "cat": "cs.AI",
+  "comment": null,
+  "jref": null
+ },
+ {
+  "id": "2608.26197",
+  "title": "Harness Engineering for Predictable Agentic Systems: An Empirical Study of Deterministic Execution Constraints",
+  "autores": [
+   "Saransh Dhage"
+  ],
+  "n_auth": 1,
+  "pub": "2026-08-25",
+  "cat": "cs.SE",
+  "comment": "9 pages, 3 tables",
+  "jref": null
+ },
+ {
+  "id": "2507.21504",
+  "title": "Evaluation and Benchmarking of LLM Agents: A Survey",
+  "autores": [
+   "Mahmoud Mohammadi",
+   "Yipeng Li",
+   "Jane Lo"
+  ],
+  "n_auth": 4,
+  "pub": "2025-07-29",
+  "cat": "cs.LG",
+  "comment": null,
+  "jref": null
+ },
+ {
+  "id": "2603.29194",
+  "title": "Multi-Layered Memory Architectures for LLM Agents: An Experimental Evaluation of Long-Term Context Retention",
+  "autores": [
+   "Sunil Tiwari",
+   "Payal Fofadiya"
+  ],
+  "n_auth": 2,
+  "pub": "2026-03-31",
+  "cat": "cs.CV",
+  "comment": null,
+  "jref": null
+ },
+ {
+  "id": "2406.04692",
+  "title": "Mixture-of-Agents Enhances Large Language Model Capabilities",
+  "autores": [
+   "Junlin Wang",
+   "Jue Wang",
+   "Ben Athiwaratkun"
+  ],
+  "n_auth": 5,
+  "pub": "2024-06-07",
+  "cat": "cs.CL",
+  "comment": null,
+  "jref": null
+ }
+]

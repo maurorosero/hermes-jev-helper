@@ -1,0 +1,122 @@
+[
+  {
+    "texto": "pasame el reporte del mes",
+    "choice": "skill",
+    "confidence": "0.87"
+  },
+  {
+    "texto": "configura un proveedor nuevo",
+    "choice": "skill",
+    "confidence": "1"
+  },
+  {
+    "texto": "ejecuta el validador",
+    "choice": "skill",
+    "confidence": "1"
+  },
+  {
+    "texto": "programa el respaldo de la base de datos",
+    "choice": "skill",
+    "confidence": "1"
+  },
+  {
+    "texto": "borra los archivos temporales",
+    "choice": "skill",
+    "confidence": "1"
+  },
+  {
+    "texto": "investiga actos de habla indirectos",
+    "choice": "research",
+    "confidence": "0.98"
+  },
+  {
+    "texto": "haceme un informe de videovigilancia",
+    "choice": "skill",
+    "confidence": "0.85"
+  },
+  {
+    "texto": "averigua opciones de NVR con GPU",
+    "choice": "research",
+    "confidence": "0.86"
+  },
+  {
+    "texto": "cuanto cobramos por hora",
+    "choice": "memory",
+    "confidence": "0.74"
+  },
+  {
+    "texto": "cual es la capital de Francia",
+    "choice": "memory",
+    "confidence": "0.98"
+  },
+  {
+    "texto": "El VPS de Alan corre en Hetzner",
+    "choice": "others",
+    "confidence": "0.56"
+  },
+  {
+    "texto": "como funciona la memoria holografica",
+    "choice": "research",
+    "confidence": "0.32"
+  },
+  {
+    "texto": "que te dije ayer sobre el hotel",
+    "choice": "history",
+    "confidence": "0.99"
+  },
+  {
+    "texto": "que prometimos al cliente del hotel",
+    "choice": "history",
+    "confidence": "0.58"
+  },
+  {
+    "texto": "recuerda que hablamos de la videovigilancia",
+    "choice": "history",
+    "confidence": "0.99"
+  },
+  {
+    "texto": "Mauro prefiere respuestas concisas sin preambulo",
+    "choice": "user",
+    "confidence": "0.98"
+  },
+  {
+    "texto": "A Mauro le molesta que le den vueltas antes de responder",
+    "choice": "user",
+    "confidence": "0.99"
+  },
+  {
+    "texto": "Mauro esta en zona horaria EST",
+    "choice": "user",
+    "confidence": "0.82"
+  },
+  {
+    "texto": "Mauro tiene nivel tecnico alto",
+    "choice": "user",
+    "confidence": "0.99"
+  },
+  {
+    "texto": "quien es Mauro",
+    "choice": "user",
+    "confidence": "0.77"
+  },
+  {
+    "texto": "que prefiere el usuario",
+    "choice": "user",
+    "confidence": "0.98"
+  },
+  {
+    "texto": "cuales son mis preferencias",
+    "choice": "user",
+    "confidence": "0.98"
+  },
+  {
+    "texto": "mi zona horaria es EST",
+    "choice": "user",
+    "confidence": "0.97"
+  },
+  {
+    "texto": "como le gusta que le hable al usuario",
+    "choice": "user",
+    "confidence": "0.92"
+  }
+]
