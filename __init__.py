@@ -256,7 +256,10 @@ class RouteHelper:
         if decision is None:
             # Se registra el motivo real del fallo (no_key, budget, http_429, ...):
             # sin esto, un clasificador que falla siempre es indistinguible de uno
-            # que nunca se llama.
+            # que nunca se llama. Si no hay motivo, se marca "unknown" en lugar de
+            # dejar una línea muda.
+            if not clf.last_error:
+                clf.last_error = "unknown"
             self._record_telemetry(clf, text, ESCAPE_ROUTE, None, src="fresh")
             return None
 

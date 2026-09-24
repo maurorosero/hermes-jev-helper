@@ -47,7 +47,12 @@ class FakeCtx:
     """Imita la API del PluginContext sin cargar el núcleo."""
 
     def __init__(self, config=None):
-        self.config = dict(config or {})
+        # Telemetría apagada por defecto: sin esto, la suite escribe en el archivo
+        # REAL de producción (~/.hermes/logs/jev-helper.jsonl) y contamina la serie
+        # con líneas de prueba (lat_ms=0.0, decisiones simuladas). Los tests que
+        # verifican telemetría la encienden y le dan su propio telemetry_path.
+        self.config = {"telemetry": False}
+        self.config.update(config or {})
         self.hooks = {}
 
     def get_config(self, key, default=None):
@@ -375,7 +380,7 @@ def test_live_classification_end_to_end(plugin):
 def test_telemetry_never_appears_in_the_injected_guide(plugin, tmp_path):
     """La guía es lo único que se paga como payload: no debe llevar telemetría."""
     telemetry_path = tmp_path / "tel.jsonl"
-    ctx = FakeCtx({"telemetry_path": str(telemetry_path)})
+    ctx = FakeCtx({"telemetry": True, "telemetry_path": str(telemetry_path)})
     helper = plugin.RouteHelper(ctx)
     result = helper.on_pre_llm_call(
         session_id="s", turn_id="t", user_message="cuanto mide el lote de Don Bosco",
@@ -395,7 +400,7 @@ def test_telemetry_records_the_decision(plugin, tmp_path):
     import json
 
     telemetry_path = tmp_path / "tel.jsonl"
-    ctx = FakeCtx({"telemetry_path": str(telemetry_path)})
+    ctx = FakeCtx({"telemetry": True, "telemetry_path": str(telemetry_path)})
     helper = plugin.RouteHelper(ctx)
     helper.on_pre_llm_call(
         session_id="s", turn_id="t", user_message="cuanto mide el lote de Don Bosco",
