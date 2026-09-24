@@ -1,0 +1,26 @@
+name: hermes-jev-helper
+version: 1.0.0
+manifest_version: 2
+api_version: 1
+description: "Route helper — clasifica la intención del turno con un modelo de decisión tipado (Jev) y anexa una guía de ruta en lenguaje natural ANTES de la llamada al modelo. Reduce la improvisación de ruta: el mismo patrón de petición recibe la misma clase de ruta. No ejecuta la tarea ni redacta la respuesta."
+author: Mauro Rosero
+license: MIT
+homepage: https://github.com/maurorosero/hermes-jev-helper
+tags: [hooks, routing, intent, determinism, jev]
+# kind: standalone — plugin de hooks; no es un secret source (backend) ni un
+# proveedor exclusivo. El default del manifiesto es standalone y es el correcto aquí.
+kind: standalone
+provides_hooks:
+  - pre_llm_call
+  - on_session_start
+config_schema:
+  enabled: {type: bool, default: true, description: "Activa o desactiva la clasificación de ruta sin desinstalar el plugin."}
+  endpoint: {type: str, default: "https://openrouter.ai/api/alpha/decisions", description: "Endpoint del modelo de decisión."}
+  model: {type: str, default: "~typesafe/jev-latest", description: "Slug del modelo de decisión tipado."}
+  api_key_env: {type: str, default: "OPENROUTER_API_KEY", description: "Nombre de la variable de entorno con la credencial (se resuelve por el scope de secretos del arnés)."}
+  timeout_s: {type: float, default: 25.0, description: "Timeout por intento de clasificación."}
+  retries: {type: int, default: 2, description: "Intentos de clasificación antes de rendirse (fail-open)."}
+  min_confidence: {type: float, default: 0.0, description: "Confianza mínima para inyectar la guía. Por debajo, se trata como 'others' (sin guía). 0.0 = desactivado."}
+  inject: {type: bool, default: true, description: "Si es false, clasifica y registra pero NO inyecta la guía (modo observación)."}
+  overrides_path: {type: str, default: "", description: "Ruta a un YAML/JSON que sobreescribe las declaraciones de criterio y las guías. Vacío = usar las internas."}
+  read_user_md: {type: bool, default: true, description: "Leer el nombre del usuario del perfil real (USER.md) para la declaración de la ruta 'user'. Si es false, usa el texto genérico."}
