@@ -254,6 +254,37 @@ def test_defaults_are_sane(plugin):
     assert clf.min_confidence == 0.0
 
 
+def test_worst_case_stays_under_the_harness_hook_limit(plugin):
+    """El peor caso debe quedar bajo `plugins.hook_callback_timeout` (30s).
+
+    Si un callback lo excede, el arnés lo abandona y la guía se pierde en
+    silencio: el fallo deja de ser observable. Este test fija el presupuesto.
+    """
+    from jev_helper_under_test.classifier import DEFAULT_BUDGET_S
+
+    clf = plugin.Classifier()
+    worst_case = clf.timeout_s * clf.retries
+    assert worst_case < 30.0, f"peor caso {worst_case}s excede el límite de hook del arnés"
+    assert clf.budget_s <= DEFAULT_BUDGET_S
+
+
+def test_budget_stops_retrying(plugin, monkeypatch):
+    """Agotado el presupuesto no se reintenta: se devuelve None de inmediato."""
+    import urllib.request
+
+    calls = []
+
+    def _slow(*args, **kwargs):
+        calls.append(1)
+        raise OSError("endpoint inalcanzable")
+
+    monkeypatch.setattr(urllib.request, "urlopen", _slow)
+    clf = plugin.Classifier(timeout_s=5.0, retries=5)
+    clf.budget_s = 0.0  # sin presupuesto: no debe intentar ni una vez
+    assert clf.classify("hola", {"skill": "x"}, api_key="fake") is None
+    assert not calls, "no debe intentar si no hay presupuesto"
+
+
 def test_text_is_truncated_before_classifying(plugin, monkeypatch):
     captured = {}
 

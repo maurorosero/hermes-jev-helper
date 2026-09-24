@@ -15,6 +15,7 @@ import json
 import logging
 import os
 import sys
+import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -24,6 +25,12 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_ENDPOINT = "https://openrouter.ai/api/alpha/decisions"
 DEFAULT_MODEL = "~typesafe/jev-latest"
+
+# El arnés abandona un callback que excede ``plugins.hook_callback_timeout``
+# (default 30 s) y el turno sigue sin guía, en silencio. Este presupuesto deja
+# margen bajo ese límite: el clasificador deja de reintentar antes de arriesgarse
+# a ser abandonado, y así el fallo es explícito (devuelve None) en vez de invisible.
+DEFAULT_BUDGET_S = 20.0
 
 
 @dataclass
@@ -96,7 +103,7 @@ class Classifier:
         *,
         endpoint: str = DEFAULT_ENDPOINT,
         model: str = DEFAULT_MODEL,
-        timeout_s: float = 25.0,
+        timeout_s: float = 8.0,
         retries: int = 2,
         min_confidence: float = 0.0,
         api_key_env: str = "OPENROUTER_API_KEY",
@@ -104,9 +111,10 @@ class Classifier:
         self.endpoint = endpoint or DEFAULT_ENDPOINT
         self.model = model or DEFAULT_MODEL
         self.api_key_env = api_key_env or "OPENROUTER_API_KEY"
-        self.timeout_s = float(timeout_s) if timeout_s else 25.0
+        self.timeout_s = float(timeout_s) if timeout_s else 8.0
         self.retries = max(1, int(retries)) if retries else 1
         self.min_confidence = float(min_confidence or 0.0)
+        self.budget_s = DEFAULT_BUDGET_S
 
     def classify(
         self,
@@ -140,11 +148,19 @@ class Classifier:
             "Content-Type": "application/json",
         }
 
+        started = time.monotonic()
         last_error: Optional[Exception] = None
         for attempt in range(self.retries):
+            budget_left = self.budget_s - (time.monotonic() - started)
+            if budget_left <= 0:
+                logger.debug("jev-helper: presupuesto agotado antes del intento %d", attempt + 1)
+                break
+            # Nunca esperar más que el presupuesto restante: así el peor caso queda
+            # bajo el límite de hook del arnés.
+            attempt_timeout = max(1.0, min(self.timeout_s, budget_left))
             try:
                 req = urllib.request.Request(self.endpoint, data=payload, headers=headers)
-                with urllib.request.urlopen(req, timeout=self.timeout_s) as resp:
+                with urllib.request.urlopen(req, timeout=attempt_timeout) as resp:
                     data = json.load(resp)
                 return self._parse(data)
             except urllib.error.HTTPError as exc:

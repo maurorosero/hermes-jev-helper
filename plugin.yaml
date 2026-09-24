@@ -18,8 +18,11 @@ config_schema:
   endpoint: {type: str, default: "https://openrouter.ai/api/alpha/decisions", description: "Endpoint del modelo de decisión."}
   model: {type: str, default: "~typesafe/jev-latest", description: "Slug del modelo de decisión tipado."}
   api_key_env: {type: str, default: "OPENROUTER_API_KEY", description: "Nombre de la variable de entorno con la credencial (se resuelve por el scope de secretos del arnés)."}
-  timeout_s: {type: float, default: 25.0, description: "Timeout por intento de clasificación."}
-  retries: {type: int, default: 2, description: "Intentos de clasificación antes de rendirse (fail-open)."}
+  # PRESUPUESTO: peor caso = timeout_s x retries. Debe quedar por debajo de
+  # plugins.hook_callback_timeout del arnes (default 30s), porque un hook que lo
+  # excede se abandona y la guia se pierde en silencio. 8 x 2 = 16s deja margen.
+  timeout_s: {type: float, default: 8.0, description: "Timeout por intento de clasificación (segundos)."}
+  retries: {type: int, default: 2, description: "Intentos antes de rendirse. Peor caso = timeout_s x retries; mantener < 30s."}
   min_confidence: {type: float, default: 0.0, description: "Confianza mínima para inyectar la guía. Por debajo, se trata como 'others' (sin guía). 0.0 = desactivado."}
   inject: {type: bool, default: true, description: "Si es false, clasifica y registra pero NO inyecta la guía (modo observación)."}
   overrides_path: {type: str, default: "", description: "Ruta a un YAML/JSON que sobreescribe las declaraciones de criterio y las guías. Vacío = usar las internas."}

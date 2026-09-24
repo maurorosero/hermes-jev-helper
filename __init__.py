@@ -99,7 +99,7 @@ class RouteHelper:
         return Classifier(
             endpoint=str(self._get("endpoint", "") or ""),
             model=str(self._get("model", "") or ""),
-            timeout_s=float(self._get("timeout_s", 25.0) or 25.0),
+            timeout_s=float(self._get("timeout_s", 8.0) or 8.0),
             retries=int(self._get("retries", 2) or 2),
             min_confidence=float(self._get("min_confidence", 0.0) or 0.0),
             api_key_env=self._api_key_env(),
