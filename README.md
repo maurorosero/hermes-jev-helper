@@ -163,9 +163,10 @@ __init__.py       register(ctx) + el hook pre_llm_call
 classifier.py     cliente del modelo de decisión + resolución de credencial
 routing.py        declaraciones de criterio y guías (datos, no lógica)
 plugin.yaml       manifiesto (kind: standalone, config_schema, provides_hooks)
-tests/            suite (23 tests, sin red salvo el de integración)
+tests/            suite (32 tests, sin red salvo el de integración)
 docs/paper-es.md          estudio de caso completo (español + abstract en inglés)
 docs/paper-honestidad-es.md  estudio de caso 2: honestidad como componente del entregable
+soul/             los dos estados del prompt de identidad + bitacora de cambios
 evidence/         datos crudos de todas las corridas
 ```
 

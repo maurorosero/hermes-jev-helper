@@ -9,6 +9,7 @@ para la línea de investigación sobre escritura de prompts de arnés.
 |---|---|
 | `andrea-soul-old.md` | El prompt de identidad **anterior**, tal como estaba en producción. Se conserva **verbatim** y no se edita: es la evidencia del estado que se midió. |
 | `andrea-soul-original.md` | El prompt de identidad **que se implementa**: la versión redactada a partir de los hallazgos. Es el "original" en el sentido de fuente canónica vigente. |
+| `bitacora.md` | El **registro de cambios** al SOUL: una entrada por cambio y por medición, con el resultado descriptivo y la valoración de cuánto mejora o empeora frente al estado anterior. |
 
 `old` = el que se retira. `original` = el que rige. Los nombres son deliberados:
 `old` marca un estado agotado, `original` marca la fuente desde la cual se
@@ -31,6 +32,19 @@ estudio de caso sobre la honestidad como componente del entregable
 Ambos archivos se cargan en el slot #1 de identidad del arnés y **se pagan
 completos en cada turno**, por lo que la diferencia de tamaño es un costo
 recurrente, no una diferencia de archivo.
+
+## La bitácora
+
+`bitacora.md` lleva el registro de cada cambio al SOUL y de cada medición, con el
+resultado descriptivo y la valoración por eje. Su regla central: **una entrada
+publicada no se reescribe** — si una medición posterior cambia el veredicto, se
+agrega una entrada nueva que la revisa.
+
+Y una distinción que la bitácora sostiene explícitamente: una mejora
+**estructural** (tamaño, número de reglas, duplicaciones, contradicciones) se mide
+sobre el texto; una mejora **conductual** requiere un banco de casos con verdad de
+referencia. Un eje sin medición se registra como `NO DETERMINABLE`, no se redondea
+a favor.
 
 ## Uso
 
