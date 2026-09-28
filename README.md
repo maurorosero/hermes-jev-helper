@@ -164,7 +164,8 @@ classifier.py     cliente del modelo de decisión + resolución de credencial
 routing.py        declaraciones de criterio y guías (datos, no lógica)
 plugin.yaml       manifiesto (kind: standalone, config_schema, provides_hooks)
 tests/            suite (23 tests, sin red salvo el de integración)
-docs/paper-es.md  estudio de caso completo (español + abstract en inglés)
+docs/paper-es.md          estudio de caso completo (español + abstract en inglés)
+docs/paper-honestidad-es.md  estudio de caso 2: honestidad como componente del entregable
 evidence/         datos crudos de todas las corridas
 ```
 
@@ -174,6 +175,32 @@ evidence/         datos crudos de todas las corridas
 con amenazas a la validez en las cuatro categorías y checklist de reproducibilidad
 de Pineau et al. (2020). Incluye las declaraciones y guías verbatim, las 24
 clasificaciones crudas, y las mediciones completas del A/B.
+
+`docs/paper-honestidad-es.md` — segundo estudio de caso, del mismo arnés. Mide el
+hueco en el prompt de sistema (21 menciones de *tarea/paso/proceso* contra 0 de
+*resultado esperado*) y propone transponer a la **conducta** el principio que este
+plugin ya aplica a la **ruta**: declarar por resultado esperado. Su aporte es un
+resultado negativo acotado —documenta por qué el prompt no puede resolver el
+problema por sí solo— y delimita el borde del mecanismo en el reporte final. La
+hoja de ruta de §8.2 es la que este plugin debe implementar.
+
+## Los dos refuerzos que este plugin implementa
+
+El plugin es la **palanca** de dos refuerzos sobre el arnés, y ambos comparten el
+mismo principio: **declarar por resultado esperado, desde afuera del agente, antes
+de que razone.**
+
+- **Refuerzo 1 — determinismo de ruta.** Que el mismo patrón de petición reciba la
+  misma clase de ruta. Implementado y medido (`docs/paper-es.md`).
+- **Refuerzo 2 — honestidad del reporte.** Que el entregable declarado incluya el
+  relato fiel de lo hecho *y de lo no hecho*, en lugar de pedir honestidad como
+  restricción paralela que compite con la tarea y pierde. Diseñado y con hoja de
+  ruta (`docs/paper-honestidad-es.md` §6.7 y §8.2); no implementado.
+
+El segundo refuerzo no se implementa antes de diseñar su evaluación, y el paso 4 de
+esa hoja de ruta —verificar el relato contra la traza de *tool calls*— requiere un
+punto de extensión que corre **después** de la acción, que este plugin todavía no
+registra (`pre_llm_call` y `on_session_start` son anteriores o iniciales).
 
 ## Licencia
 
