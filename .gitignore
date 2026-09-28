@@ -3,8 +3,8 @@ __pycache__/
 .venv/
 *.log
 
-# El corpus de conducta (E002) son transcripciones reales del operador: correos,
-# IPs internas y detalles de infraestructura. Este repo es PUBLICO, asi que el
-# corpus no se versiona nunca. El script que lo genera SI se versiona
-# (evidence/export_control.py): el metodo es publicable, los datos del operador no.
+# El corpus de conducta (E002) es transitorio y no se versiona: son transcripciones
+# reales del operador (correos, IPs internas) y este repo es PUBLICO. La carpeta
+# contiene tambien el script que lo genera y el documento de metodo. Cuando E002
+# cierre, se borra entera.
 evidence/muestras-e002/
