@@ -197,10 +197,14 @@ de que razone.**
   restricción paralela que compite con la tarea y pierde. Diseñado y con hoja de
   ruta (`docs/paper-honestidad-es.md` §6.7 y §8.2); no implementado.
 
-El segundo refuerzo no se implementa antes de diseñar su evaluación, y el paso 4 de
-esa hoja de ruta —verificar el relato contra la traza de *tool calls*— requiere un
-punto de extensión que corre **después** de la acción, que este plugin todavía no
-registra (`pre_llm_call` y `on_session_start` son anteriores o iniciales).
+El segundo refuerzo no se implementa antes de diseñar su evaluación. El paso 5 de esa
+hoja de ruta —verificar el relato contra la traza de *tool calls*— **no requiere tocar
+el motor del arnés**: los hooks que corre después de la acción ya existen en su
+declaración oficial de eventos válidos y este plugin todavía no los registra
+(`post_tool_call`, `transform_llm_output`, `pre_verify`). La salvedad es que
+`pre_verify` sólo dispara si el turno editó archivos, y su alcance está acotado por
+`agent.max_verify_nudges` — extenderlo a turnos sin edición es una decisión de diseño
+sobre el umbral, no un cambio de motor. Detalle en `docs/paper-honestidad-es.md` §8.2.
 
 ## Licencia
 

@@ -839,13 +839,33 @@ La hoja de ruta que se deriva de la sección 6.7, en orden de dependencia:
 | 2 | El banco de casos con verdad de referencia | `evidence/` del plugin | Paso 1, para tener el criterio con que etiquetar |
 | 3 | El dominio del entregable declarado en las `criteria` del clasificador | `routing.py` | Paso 2, para medir separabilidad antes de escribir |
 | 4 | Medición de fidelidad de reporte y de desalineación condicional | `evidence/` del plugin | Pasos 2 y 3 |
-| 5 | Verificación del relato contra la traza de *tool calls* | hook nuevo en el plugin | Paso 4, porque sin medición no se sabe qué tolerar |
+| 5 | Verificación del relato contra la traza de *tool calls* | hooks del plugin (`post_tool_call`, `transform_llm_output`, `pre_verify`) | Paso 4, porque sin medición no se sabe qué tolerar |
 
-El paso 5 es el único que requiere un punto de extensión que el mecanismo
-compañero no usa todavía: la verificación del relato ocurre **después** de que el
-agente actuó, y el plugin hoy sólo registra hooks que corren antes o al inicio de la
-sesión. Si ese hook no existe como punto de extensión del arnés, la decisión de
-tocarlo es del operador y no de este documento.
+Los puntos de extensión para el paso 5 **existen en el arnés** y se verificaron
+contra su declaración oficial de hooks válidos (`VALID_HOOKS`, 41 eventos). El
+arnés expone, entre otros, tres eventos que corren después de la acción y que este
+plugin **no** registra todavía:
+
+| Evento | Cuándo corre | Payload relevante | Qué habilita |
+|---|---|---|---|
+| `post_tool_call` | tras cada llamada a herramienta | `tool_name`, `args`, `result`, `duration_ms`, `session_id`, `tool_call_id` | acumular la traza real de lo hecho |
+| `transform_llm_output` | sobre la salida del modelo | texto normalizado | contrastar el relato contra la traza y, si procede, sustituirlo |
+| `pre_verify` | una vez por turno, antes de verificar/terminar | `final_response`, `changed_paths`, `coding`, `attempt` | devolver `{"action": "continue", "message"}` y exigir una corrección |
+
+**La salvedad que importa, y es una restricción real:** `pre_verify` sólo dispara
+**si el turno editó archivos** —la condición es `if _edited and has_hook(...)`, con
+`_edited` derivado de `_turn_file_mutation_paths`— y su número de reconducciones
+está acotado por `agent.max_verify_nudges`. Es decir: el gancho más directo para
+exigir un reporte fiel existe, pero **hoy está atado a la edición de código**, y un
+turno que no edita archivos —donde también puede callarse algo— no lo activa.
+Extenderlo a turnos sin edición requiere una decisión de diseño sobre el umbral, no
+un cambio en el motor.
+
+En consecuencia, el paso 5 **no requiere tocar el núcleo del arnés**: se implementa
+con los hooks que el arnés ya expone, que es el criterio de frontera vigente en este
+ecosistema (agotar la vía plugin antes de considerar el core). Lo que falta no es el
+punto de extensión sino el diseño de la evaluación del paso 4 y el criterio de
+tolerancia, y por eso el orden de la tabla no se altera.
 
 ### 8.3 Un segundo hilo, de naturaleza distinta
 
