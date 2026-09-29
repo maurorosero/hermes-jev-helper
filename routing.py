@@ -7,8 +7,14 @@ sin tocar el motor.
 
 Las declaraciones siguen un principio de diseño que la investigación estableció:
 cada ruta se declara por el RESULTADO ESPERADO, no por la tarea. Las que describen
-una tarea (skill, research) dependen del verbo del texto; las que nombran un
-resultado (memory, history, user) son más estables.
+una tarea (skill, research) dependen del verbo del texto; la que nombra un
+resultado (history) es más estable.
+
+ALCANCE: cuatro rutas. ``memory`` y ``user`` se retiraron del esquema. La memoria
+de hechos es TRANSVERSAL: el prefetch la inyecta en cada turno, sea cual sea el
+tema, así que un carril propio duplicaba lo que ya llega sin clasificador (medido:
+37% de los turnos consulta la memoria, 5% la recibía como ruta). El perfil del
+usuario viaja siempre en el system prompt por la misma razón.
 
 Ver docs/paper-es.md §4.2 y Apéndices A y B del estudio de caso.
 """
@@ -18,20 +24,19 @@ from __future__ import annotations
 from typing import Dict, Optional
 
 # El orden es el orden de presentación de las opciones al clasificador.
-ROUTES = ("skill", "research", "memory", "history", "user", "others")
+ROUTES = ("skill", "research", "history", "others")
 
 # Nombre de la ruta de escape. No inyecta guía: declara que no hay ruta definida.
 ESCAPE_ROUTE = "others"
 
 
-def declarations(user_name: str = "") -> Dict[str, str]:
+def declarations() -> Dict[str, str]:
     """Criterios de clasificación, uno por ruta.
 
-    ``user_name`` entra en la declaración de ``user`` para que la ruta se resuelva
-    contra el perfil real y no contra una lista de nombres codificada. Si viene
-    vacío, la declaración usa un texto genérico.
+    Ya no recibe ``user_name``: el parámetro existía solo para la declaración de
+    ``user``, que se retiró del esquema. El clasificador no necesita saber quién
+    es el usuario para decidir el punto de partida del turno.
     """
-    quien = user_name or "el usuario"
     return {
         "skill": (
             "El texto implica explicita o implicitamente la ejecucion de una tarea "
@@ -40,24 +45,9 @@ def declarations(user_name: str = "") -> Dict[str, str]:
         "research": (
             "Cualquier proceso o redaccion que implique investigar algo."
         ),
-        "memory": (
-            "Obtener o recuperar cualquier dato que implique recuperar facts, datos "
-            "persistentes cortos, reglas, criterios. Siempre y cuando el valor "
-            "resultante sean redacciones o datos cortos, no mas de un parrafo."
-        ),
         "history": (
             "Cualquier accion que implique la recuperacion de historial o recuerdos "
             "de sesiones o conversaciones pasadas."
-        ),
-        "user": (
-            f"El texto se refiere a la persona del usuario ({quien}) o pide "
-            "informacion sobre el: su identidad, sus preferencias, sus habitos, su "
-            "nivel tecnico, lo que le molesta, su estilo de trato. Incluye cuando el "
-            "usuario habla de si mismo en primera persona (mi, mis, yo) sobre esos "
-            "temas. Queda EXCLUIDO si es una solicitud o encargo dirigido a quien "
-            "responde (un pedido de hacer, entregar o traer algo), aunque use 'mi' o "
-            "mencione al usuario como destinatario: ahi el usuario es quien pide, no "
-            "el tema del que se guarda informacion."
         ),
         ESCAPE_ROUTE: "Lo que no encaja en las choices anteriores.",
     }
@@ -95,25 +85,11 @@ def guides() -> Dict[str, str]:
             "Paso 2: si la base no tiene datos suficientes, entonces usa busqueda web. "
             "No respondas de memoria."
         ),
-        "memory": (
-            "[ruta: memory] Paso 1: busca en la memoria persistente de hechos con su "
-            "herramienta de busqueda - es una tool directa, no requiere cargar ningun "
-            "skill. Paso 2: si no esta ahi, dilo y ofrece las vias para buscarlo (base "
-            "de conocimiento, documentos, o web) y pedi confirmacion antes de salir. "
-            "Paso 3: con lo que hayas obtenido, resuelve con libertad, como en others."
-        ),
         "history": (
             "[ruta: history] Paso 1: busca en el historial de conversaciones con la "
             "herramienta de busqueda de sesiones antes de responder. La respuesta esta "
             "en lo que ya se hablo, no en tu entrenamiento. "
             "Paso 2: si no aparece, dilo y ofrece alternativas."
-        ),
-        "user": (
-            "[ruta: user] Paso 1: revisa las fuentes primarias del usuario: lee su "
-            "archivo de perfil y consulta la base de conocimiento local (carpeta "
-            "markdown en esta maquina, NO internet). "
-            "Paso 2: si no esta en esas fuentes, usa la herramienta de confirmacion "
-            "para PEDIR APROBACION antes de usar busqueda web."
         ),
         # Unica ruta que no inyecta orientacion: es el escape explicito.
         ESCAPE_ROUTE: (
@@ -128,7 +104,6 @@ def load_overrides(path: str) -> Optional[Dict[str, object]]:
 
     Forma esperada del archivo::
 
-        user_name: Mauro
         declarations:
           skill: "..."
           research: "..."
@@ -166,8 +141,6 @@ def load_overrides(path: str) -> Optional[Dict[str, object]]:
             block = data.get(key)
             if isinstance(block, dict):
                 out[key] = {str(k): str(v) for k, v in block.items() if v is not None}
-        if isinstance(data.get("user_name"), str):
-            out["user_name"] = data["user_name"]
         return out or None
     except Exception:
         return None

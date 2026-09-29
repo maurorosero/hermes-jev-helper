@@ -4,8 +4,8 @@ Externaliza la decisión de ruta de un arnés de agente a un **clasificador tipa
 intención** que corre *antes* de la llamada al modelo, y anexa al turno una guía de
 ruta en lenguaje natural.
 
-El mecanismo no ejecuta la tarea ni produce la respuesta: elige una de seis rutas
-(`skill`, `research`, `memory`, `history`, `user`, `others`) y declara una confianza.
+El mecanismo no ejecuta la tarea ni produce la respuesta: elige una de cuatro rutas
+(`skill`, `research`, `history`, `others`) y declara una confianza.
 El objetivo no es mejorar la calidad de la respuesta, sino **reducir la improvisación
 de ruta**: que el mismo patrón de petición reciba la misma clase de ruta.
 
@@ -52,7 +52,6 @@ renderiza a partir del `config_schema` del manifiesto.
 | `min_confidence` | `0.0` | Bajo el umbral se aplica la ruta de escape. `0.0` = desactivado |
 | `inject` | `true` | `false` clasifica y registra, pero no inyecta (modo observación) |
 | `overrides_path` | — | YAML o JSON que sobreescribe criterios y guías |
-| `read_user_md` | `true` | Leer el nombre del usuario del perfil real (`USER.md`) |
 
 Ejemplo:
 
@@ -83,7 +82,7 @@ Un archivo roto se ignora en silencio (nunca tumba el turno).
 
 ## Qué hace cada ruta
 
-Las seis guías nombran la **herramienta exacta**, encadenan con una **condición de
+Las cuatro guías nombran la **herramienta exacta**, encadenan con una **condición de
 salida** ("si esto no alcanza, entonces...") y **acotan la libertad** en lugar de
 eliminarla: el último paso devuelve el criterio al modelo.
 
@@ -91,13 +90,11 @@ eliminarla: el último paso devuelve el criterio al modelo.
 |---|---|
 | `skill` | Cargar un procedimiento almacenado; si no hay, ejecutar y avisar |
 | `research` | La base de conocimiento local (carpeta markdown, **no** internet); luego web |
-| `memory` | La memoria persistente de hechos; luego ofrecer vías y confirmar |
 | `history` | El historial de conversaciones |
-| `user` | El archivo de perfil y la base local; pedir aprobación antes de la web |
 | `others` | **Nada**: declara que no hay ruta y deja el turno al criterio del modelo |
 
 `others` es la **ruta de escape** y su diseño es deliberado: sin ella, el
-clasificador estaría forzado a elegir una de las otras cinco incluso cuando ninguna
+clasificador estaría forzado a elegir una de las otras tres incluso cuando ninguna
 aplica, e inyectaría una orientación equivocada con confianza alta. Que su guía diga
 "no busques" no contradice el mecanismo: es la forma en que el clasificador declara
 que no sabe (estudio de caso, §6.3).

@@ -81,11 +81,15 @@ def test_registers_expected_hooks(plugin):
 def test_routes_are_complete(plugin):
     from jev_helper_under_test.routing import ESCAPE_ROUTE, ROUTES, declarations, guides
 
-    assert len(ROUTES) == 6
+    assert len(ROUTES) == 4
     assert ESCAPE_ROUTE in ROUTES
-    decl, gds = declarations("X"), guides()
+    decl, gds = declarations(), guides()
     assert set(decl) == set(ROUTES), "cada ruta necesita declaración"
     assert set(gds) == set(ROUTES), "cada ruta necesita guía"
+    # memory y user se retiraron del esquema: la memoria de hechos es transversal
+    # (el prefetch la inyecta en cada turno) y el perfil viaja en el system prompt.
+    assert "memory" not in ROUTES
+    assert "user" not in ROUTES
 
 
 def test_escape_route_has_no_orientation(plugin):
@@ -97,12 +101,14 @@ def test_escape_route_has_no_orientation(plugin):
     assert "No cargues skills ni busques" in text
 
 
-def test_user_declaration_names_the_user(plugin):
+def test_declarations_take_no_arguments(plugin):
+    """El clasificador no necesita saber quién es el usuario para decidir la ruta."""
+    import inspect
+
     from jev_helper_under_test.routing import declarations
 
-    assert "Mauro" in declarations("Mauro")["user"]
-    # Sin nombre, la declaración sigue siendo válida (texto genérico).
-    assert declarations("")["user"]
+    sig = inspect.signature(declarations)
+    assert not sig.parameters, "declarations() ya no recibe user_name"
 
 
 # -------------------------------------------------------------------- fail-open
@@ -165,10 +171,10 @@ def test_response_parse_tolerates_garbage(plugin):
 
 def test_response_parse_reads_decision(plugin):
     clf = plugin.Classifier()
-    dec = clf._parse({"answers": {"q": {"choice": "memory", "confidence": 0.73,
-                                        "probabilities": {"memory": 0.78, "others": 0.18}}}})
+    dec = clf._parse({"answers": {"q": {"choice": "history", "confidence": 0.73,
+                                        "probabilities": {"history": 0.78, "others": 0.18}}}})
     assert dec is not None
-    assert dec.route == "memory"
+    assert dec.route == "history"
     assert dec.confidence == pytest.approx(0.73)
     assert dec.probabilities["others"] == pytest.approx(0.18)
 
@@ -328,14 +334,24 @@ def test_broken_overrides_file_is_ignored(plugin, tmp_path):
     assert decl["skill"] and gds["skill"]
 
 
-def test_user_name_read_from_profile(plugin):
-    """El nombre sale del perfil real; si no hay perfil, cadena vacía."""
+def test_no_profile_read_happens_per_turn(plugin, monkeypatch):
+    """El turno ya no lee el perfil: era trabajo exclusivo de la ruta 'user'."""
+    import builtins
+
+    real_open = builtins.open
+    leidos = []
+
+    def espia(path, *a, **k):
+        leidos.append(str(path))
+        return real_open(path, *a, **k)
+
+    monkeypatch.setattr(builtins, "open", espia)
     ctx = FakeCtx()
     plugin.register(ctx)
     helper = ctx.hooks["pre_llm_call"][0].__self__
-    name = helper._user_name()
-    assert isinstance(name, str)
-    assert "\n" not in name
+    helper._criteria_and_guides()
+    assert not any("USER.md" in p for p in leidos), "no debe leerse USER.md por turno"
+    assert not hasattr(helper, "_user_name")
 
 
 # ------------------------------------------------------------------ integracion
@@ -359,18 +375,42 @@ def test_live_classification_end_to_end(plugin):
         ("pasame el reporte del mes", "skill"),
         ("investiga actos de habla indirectos", "research"),
         ("que te dije ayer sobre el hotel", "history"),
-        ("cuanto cobramos por hora", "memory"),
-        ("Mauro prefiere respuestas concisas", "user"),
     ]
     hits = 0
     for text, expected in cases:
-        dec = clf.classify(text, declarations("Mauro"))
+        dec = clf.classify(text, declarations())
         assert dec is not None, f"el clasificador devolvió None para {text!r}"
-        assert dec.route in {"skill", "research", "memory", "history", "user", "others"}
+        assert dec.route in {"skill", "research", "history", "others"}
         if dec.route == expected:
             hits += 1
     # Se observó 5/5 en el estudio; se exige mayoría para no acoplar el test al modelo.
-    assert hits >= 3, f"solo {hits}/5 rutas coincidieron con la expectativa"
+    assert hits >= 2, f"solo {hits}/3 rutas coincidieron con la expectativa"
+
+
+def test_retired_route_from_model_falls_back_to_escape(plugin, monkeypatch):
+    """Si el modelo devuelve una ruta retirada, el turno cae en la de escape.
+
+    El esquema se envía cerrado, pero un modelo puede alucinar un nombre viejo o
+    un clasificador viejo quedar cacheado. La coerción en `on_pre_llm_call`
+    (route not in ROUTES -> ESCAPE_ROUTE) es la red de seguridad.
+    """
+    class FakeClf:
+        def classify(self, text, criteria, api_key=None):
+            from jev_helper_under_test.classifier import Decision
+            return Decision(route="memory", confidence=0.9,
+                            probabilities={"memory": 0.9})
+
+        below_threshold = staticmethod(lambda d: False)
+        last_error = None
+        last_latency_ms = 0.0
+        last_attempts = 1
+
+    monkeypatch.setattr(plugin.RouteHelper, "_classifier", lambda self: FakeClf())
+    monkeypatch.setattr(plugin, "resolve_api_key", lambda name: "fake-key")
+    pre = _hook(plugin)
+    result = pre(session_id="s", turn_id="t1", user_message="cuanto mide el lote")
+    guide = (result or {}).get("context", "")
+    assert "[ruta: others]" in guide, f"una ruta retirada debe caer en others, no en {guide!r}"
 
 
 # --------------------------------------------------------------------------- #
@@ -409,7 +449,7 @@ def test_telemetry_records_the_decision(plugin, tmp_path):
     lines = [json.loads(l) for l in telemetry_path.read_text().splitlines() if l.strip()]
     assert len(lines) == 1
     rec = lines[0]
-    assert rec["route"] in ("memory", "research", "others", "skill", "history", "user")
+    assert rec["route"] in ("research", "others", "skill", "history")
     assert rec["src"] == "fresh"
     assert "lat_ms" in rec and rec["lat_ms"] >= 0
     assert len(rec["fp"]) == 8
@@ -433,7 +473,7 @@ def test_telemetry_disabled_writes_nothing(plugin, tmp_path):
 def test_compact_probs_drops_zeroes_and_rounds(plugin):
     telem = plugin.Telemetry(None, enabled=False)
     assert telem is not None
-    out = plugin.compact_probs({"skill": 0.884, "research": 0.08, "memory": 0.0, "others": 0.001})
+    out = plugin.compact_probs({"skill": 0.884, "research": 0.08, "history": 0.0, "others": 0.001})
     assert out == {"skill": 0.88, "research": 0.08}, "los ceros no aportan y no se guardan"
 
 

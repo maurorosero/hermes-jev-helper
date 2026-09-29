@@ -3,9 +3,9 @@
 QUÉ HACE
 --------
 Antes de cada llamada al modelo, clasifica la intención del turno con un modelo de
-decisión que recibe un esquema cerrado de seis rutas (``skill``, ``research``,
-``memory``, ``history``, ``user``, ``others``) y anexa al turno una guía en
-lenguaje natural que nombra dónde buscar.
+decisión que recibe un esquema cerrado de cuatro rutas (``skill``, ``research``,
+``history``, ``others``) y anexa al turno una guía en lenguaje natural que nombra
+dónde buscar.
 
 QUÉ NO HACE
 -----------
@@ -43,8 +43,6 @@ Referencia del mecanismo y de las mediciones: docs/paper-es.md
 from __future__ import annotations
 
 import logging
-import os
-import re
 from typing import Any, Dict, Optional
 
 from .classifier import Classifier, Decision, resolve_api_key
@@ -96,10 +94,6 @@ class RouteHelper:
     @property
     def inject(self) -> bool:
         return bool(self._get("inject", True))
-
-    @property
-    def read_user_md(self) -> bool:
-        return bool(self._get("read_user_md", True))
 
     def _api_key_env(self) -> str:
         """Nombre de la variable de entorno que contiene la credencial."""
@@ -154,64 +148,23 @@ class RouteHelper:
     def _criteria_and_guides(self) -> tuple[Dict[str, str], Dict[str, str], str]:
         """Devuelve (declaraciones, guías, nombre de usuario).
 
+        El tercer elemento es siempre cadena vacía: existía para la ruta ``user``,
+        retirada del esquema. Se conserva la forma de tres valores para no tocar
+        los llamadores.
+
         Un archivo de overrides, si existe y es válido, reemplaza por clave. Si no,
         se usan los valores internos del módulo ``routing``.
         """
-        name = self._user_name() if self.read_user_md else ""
-        decl = declarations(name)
+        decl = declarations()
         gds = guides()
 
         override_path = str(self._get("overrides_path", "") or "")
         if override_path:
             data = load_overrides(override_path)
             if data:
-                if isinstance(data.get("user_name"), str) and data["user_name"]:
-                    # El nombre del override tiene precedencia y recalcula la declaración.
-                    name = str(data["user_name"])
-                    decl = declarations(name)
                 decl.update(data.get("declarations") or {})  # type: ignore[arg-type]
                 gds.update(data.get("guides") or {})         # type: ignore[arg-type]
-        return decl, gds, name
-
-    def _user_name(self) -> str:
-        """Nombre del usuario leído del perfil real, no de una lista codificada.
-
-        Estrategia: sobre las entradas del perfil, contar los nombres propios que
-        aparecen en dos o más entradas y elegir el más frecuente. Si algo falla,
-        devuelve cadena vacía y la declaración usa el texto genérico.
-        """
-        try:
-            from tools.memory_tool import get_memory_dir  # type: ignore
-
-            path = get_memory_dir() / "USER.md"
-        except Exception:
-            path = os.path.expanduser("~/.hermes/memories/USER.md")
-        try:
-            with open(path, "r", encoding="utf-8") as fh:
-                text = fh.read()
-        except Exception:
-            return ""
-        if not text.strip():
-            return ""
-
-        # Formato del perfil: entradas separadas por un delimitador en línea propia.
-        entries = [e.strip() for e in re.split(r"\n\s*§\s*\n", text) if e.strip()]
-        if not entries:
-            entries = [text]
-        counts: Dict[str, int] = {}
-        for entry in entries:
-            head = re.match(r"^([A-ZÁÉÍÓÚÑ][\wáéíóúñ]+)(?=\s*[:,]|\s)", entry)
-            if head:
-                token = head.group(1)
-                counts[token] = counts.get(token, 0) + 1
-        candidates = set(re.findall(r"\b([A-ZÁÉÍÓÚÑ][\wáéíóúñ]{2,})\b", text))
-        for token in candidates:
-            hits = sum(1 for e in entries if re.search(rf"\b{re.escape(token)}\b", e))
-            if hits >= 2:
-                counts[token] = max(counts.get(token, 0), hits)
-        if not counts:
-            return ""
-        return max(counts, key=lambda k: counts[k])
+        return decl, gds, ""
 
     # ------------------------------------------------------------------- hooks
     def on_pre_llm_call(self, **kwargs: Any) -> Optional[Dict[str, str]]:
