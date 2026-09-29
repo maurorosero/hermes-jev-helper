@@ -102,7 +102,11 @@ class RouteHelper:
     def _classifier(self) -> Classifier:
         return Classifier(
             endpoint=str(self._get("endpoint", "") or ""),
-            model=str(self._get("model", "") or ""),
+            # La clave se llama decision_model, NO model: 'model' colisiona con la
+            # del core y el arnés la rechaza ("Rejected config path 'model' from
+            # plugin hermes-jev-helper"). Se acepta 'model' como fallback para no
+            # romper una config existente.
+            model=str(self._get("decision_model", "") or self._get("model", "") or ""),
             timeout_s=float(self._get("timeout_s", 8.0) or 8.0),
             retries=int(self._get("retries", 2) or 2),
             min_confidence=float(self._get("min_confidence", 0.0) or 0.0),

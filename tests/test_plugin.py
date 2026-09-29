@@ -111,6 +111,27 @@ def test_declarations_take_no_arguments(plugin):
     assert not sig.parameters, "declarations() ya no recibe user_name"
 
 
+def test_config_schema_does_not_shadow_core_keys(plugin):
+    """El schema no debe declarar 'model': colisiona con la clave del core.
+
+    Síntoma de la colisión (214 ocurrencias hasta que se corrigió):
+        WARNING hermes_cli.plugins: Rejected config path 'model' from plugin
+        hermes-jev-helper
+    La clave del plugin se llama decision_model.
+
+    Se parsea sin PyYAML (el venv del plugin no lo trae): alcanza con mirar las
+    claves de nivel superior del bloque config_schema, que en este archivo son
+    líneas indentadas dos espacios.
+    """
+    import re
+
+    text = (ROOT / "plugin.yaml").read_text()
+    block = text.split("config_schema:", 1)[1]
+    keys = set(re.findall(r"^  ([a-z_]+):", block, flags=re.MULTILINE))
+    assert "model" not in keys, "usar decision_model, no model"
+    assert "decision_model" in keys
+
+
 # -------------------------------------------------------------------- fail-open
 
 

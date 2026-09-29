@@ -45,7 +45,7 @@ renderiza a partir del `config_schema` del manifiesto.
 |---|---|---|
 | `enabled` | `true` | Activa o desactiva la clasificación sin desinstalar |
 | `endpoint` | `https://openrouter.ai/api/alpha/decisions` | Endpoint del modelo de decisión |
-| `model` | `~typesafe/jev-latest` | Slug del modelo de decisión |
+| `decision_model` | `~typesafe/jev-latest` | Slug del modelo de decisión (no `model`: colisiona con la clave del core) |
 | `api_key_env` | `OPENROUTER_API_KEY` | Nombre de la variable con la credencial |
 | `timeout_s` | `25.0` | Timeout por intento |
 | `retries` | `2` | Intentos antes de rendirse (fail-open) |
