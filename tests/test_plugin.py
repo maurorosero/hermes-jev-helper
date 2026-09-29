@@ -112,12 +112,16 @@ def test_declarations_take_no_arguments(plugin):
 
 
 def test_config_schema_does_not_shadow_core_keys(plugin):
-    """El schema no debe declarar 'model': colisiona con la clave del core.
+    """El schema no debe declarar 'model': es una raíz RESERVADA del core.
 
     Síntoma de la colisión (214 ocurrencias hasta que se corrigió):
         WARNING hermes_cli.plugins: Rejected config path 'model' from plugin
         hermes-jev-helper
-    La clave del plugin se llama decision_model.
+
+    'model' es reservada en `_PLUGIN_SETTING_RESERVED_ROOTS` y get_config la
+    rechaza: primero loguea el warning, después lanza. La clave del plugin se
+    llama decision_model, y NO hay fallback al nombre viejo (leerlo volvería a
+    emitir el warning).
 
     Se parsea sin PyYAML (el venv del plugin no lo trae): alcanza con mirar las
     claves de nivel superior del bloque config_schema, que en este archivo son
@@ -130,6 +134,31 @@ def test_config_schema_does_not_shadow_core_keys(plugin):
     keys = set(re.findall(r"^  ([a-z_]+):", block, flags=re.MULTILINE))
     assert "model" not in keys, "usar decision_model, no model"
     assert "decision_model" in keys
+
+
+def test_classifier_never_reads_the_reserved_model_key(plugin):
+    """El código no debe pedir get_config('model') en ninguna ruta.
+
+    Se espía get_config y se recorre la construcción del clasificador: si alguien
+    reintroduce un fallback a 'model', este test lo atrapa antes de que el warning
+    vuelva a inundar el log (el de schema solo mira el YAML, no el código).
+    """
+    pedidas = []
+
+    class Ctx:
+        def get_config(self, key, default=None):
+            pedidas.append(key)
+            return default
+
+        def register_hook(self, name, cb):
+            pass
+
+    plugin.RouteHelper(Ctx())._classifier()
+    assert "model" not in pedidas, (
+        "'model' es raíz reservada del core: pedirla emite el warning "
+        "y luego lanza"
+    )
+    assert "decision_model" in pedidas
 
 
 # -------------------------------------------------------------------- fail-open
